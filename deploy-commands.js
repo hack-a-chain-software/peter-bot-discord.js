@@ -3,6 +3,8 @@ const { REST } = require('@discordjs/rest');
 const { Routes } = require('discord-api-types/v9');
 const { clientId, guildId, BOT_TOKEN } = require('./config.json');
 
+
+
 const commands = [];
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 
@@ -13,6 +15,16 @@ for (const file of commandFiles) {
 }
 
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
+
+// rest.get(Routes.applicationGuildCommands(clientId, guildId))
+//     .then(data => {
+//         const promises = [];
+//         for (const command of data) {
+//             const deleteUrl = `${Routes.applicationGuildCommands(clientId, guildId)}/${command.id}`;
+//             promises.push(rest.delete(deleteUrl));
+//         }
+//         return Promise.all(promises);
+//     });
 
 (async () => {
     try {
