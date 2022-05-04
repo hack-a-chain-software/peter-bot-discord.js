@@ -50,7 +50,6 @@ module.exports = {
             });
 
         } else {
-            console.log(walletDB.near_wallet)
             message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}`
 
             await interaction.reply({
