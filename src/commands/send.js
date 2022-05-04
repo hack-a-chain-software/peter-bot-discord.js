@@ -11,7 +11,7 @@ module.exports = {
                 .setDescription('The $Token or $NEAR to be sent')
                 .setRequired(true)
                 .addChoice('Near', '$NEAR')
-                .addChoice('Utopia', 'hack_token.testnet')
+                .addChoice('Utopia', 'utopia.secretskelliessociety.near')
                 .setRequired(true))
         .addNumberOption(option =>
             option.setName('amount')
