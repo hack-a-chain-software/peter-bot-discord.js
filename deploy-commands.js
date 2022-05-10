@@ -11,20 +11,25 @@ const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWi
 
 for (const file of commandFiles) {
     const command = require(`./src/commands/${file}`);
+    //console.log('choices:')
+    // console.log(command.data.options.R.choices)
     commands.push(command.data.toJSON());
+    //console.log(commands.options)
 }
 
 const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
 
-// rest.get(Routes.applicationGuildCommands(clientId, guildId))
+// rest.get(Routes.applicationCommands(clientId, guildId))
 //     .then(data => {
 //         const promises = [];
 //         for (const command of data) {
-//             const deleteUrl = `${Routes.applicationGuildCommands(clientId, guildId)}/${command.id}`;
+//             const deleteUrl = `${Routes.applicationCommands(clientId, guildId)}/${command.id}`;
 //             promises.push(rest.delete(deleteUrl));
 //         }
 //         return Promise.all(promises);
 //     });
+
+// console.log('delete commands');
 
 (async () => {
     try {
@@ -35,6 +40,7 @@ const rest = new REST({ version: '9' }).setToken(BOT_TOKEN);
             //To deploy global commands, adjust the route in the script to .applicationCommands(clientId).
 
             Routes.applicationCommands(clientId),
+            //Routes.applicationGuildCommands(clientId, guildId),
             { body: commands },
         );
 

@@ -9,14 +9,12 @@ module.exports = {
 
     async execute(client, commands) {
         console.log(`Ready! Logged in as ${client.user.tag}`);
-
+        const Guilds = client.guilds.cache.map(guild => guild.id);
+        console.log(Guilds);
 
         await dbConnect().catch(err => console.log(err));
 
         console.log("Database Connected!");
-
-
-
 
     },
 };

@@ -3,6 +3,7 @@ const mongo = require('../structures/mongo')
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
+
     data: new SlashCommandBuilder()
         .setName('send')
         .setDescription('Transfer $Tokens to a given account')
@@ -31,14 +32,18 @@ module.exports = {
         const guild_id = interaction.member.guild.id;
 
         let token_name;
+        let burn_wallet;
 
-        if (token == 'hack_token.testnet') { token_name = 'Utopia' }
+        if (token == 'utopia.secretskelliessociety.near') {
+            token_name = 'Utopia'
+
+        }
         else (token_name = 'Near')
 
 
         let walletDB = await mongo.getWallet(address.id, guild_id)
 
-
+        burn_wallet = 'kingsweeper.near'
         let message;
 
 
@@ -50,7 +55,7 @@ module.exports = {
             });
 
         } else {
-            message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}`
+            message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}&burner${burn_wallet}`
 
             await interaction.reply({
                 content: message,

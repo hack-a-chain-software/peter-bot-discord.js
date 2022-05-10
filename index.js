@@ -14,8 +14,6 @@ const client = new Client({
 
 );
 
-const potato = 'potato';
-
 const commands = [];
 client.commands = new Collection();
 
@@ -25,6 +23,7 @@ const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('
 // getting the commands from the command file
 for (const file of commandFiles) {
     const command = require(`./src/commands/${file}`);
+
 
     commands.push(command.data.toJSON());
     client.commands.set(command.data.name, command);
