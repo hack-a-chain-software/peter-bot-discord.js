@@ -55,7 +55,7 @@ module.exports = {
             });
 
         } else {
-            message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}&burner${burn_wallet}`
+            message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}&burner=${burn_wallet}`
 
             await interaction.reply({
                 content: message,
