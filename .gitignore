@@ -25,3 +25,4 @@ yarn-debug.log*
 yarn-error.log*
 
 /src/commands/btntest.js
+/src/commands/btntest

@@ -1,68 +1,110 @@
-const mongo = require('../structures/mongo')
-
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const mongo = require('../structures/mongo')
+const { MessageActionRow, MessageButton } = require('discord.js');
 
 module.exports = {
-
     data: new SlashCommandBuilder()
         .setName('send')
-        .setDescription('Transfer $Tokens to a given account')
-        .addStringOption(option =>
-            option.setName('token')
-                .setDescription('The $Token or $NEAR to be sent')
+        .setDescription('Transfer tokens to your friends')
+        .addStringOption((option) =>
+            option
+                .setName('token')
+                .setDescription('Select your token from the list')
                 .setRequired(true)
-                .addChoice('Near', '$NEAR')
-                .addChoice('Utopia', 'utopia.secretskelliessociety.near')
-                .setRequired(true))
+                .setAutocomplete(true))
         .addNumberOption(option =>
             option.setName('amount')
-                .setDescription('The amount of $Tokens to be sent')
+                .setDescription('The amount of Tokens to be sent')
                 .setRequired(true))
         .addUserOption(option =>
             option.setName('address')
-                .setDescription('The receiver account address')
+                .setDescription('The receiving user (wallet must be saved)')
                 .setRequired(true)),
-
 
     async execute(interaction) {
 
-        const amount = interaction.options.getNumber("amount");
-        const address = interaction.options.getUser("address");
-        const token = interaction.options.getString("token");
-        const guild_id = interaction.member.guild.id;
+        const guildID = interaction.member.guild.id;
 
-        let token_name;
-        let burn_wallet;
+        let guild = await mongo.getGuild(guildID)
+        let choices = [];
+        let tokens = [];
+        let ephemeral = true;
+        let row = null;
 
-        if (token == 'utopia.secretskelliessociety.near') {
-            token_name = 'Utopia'
+        //loop through guild token and set to autocomplete 
+
+        for (let i = 0; i < guild.guild_tokens.length; i++) {
+            choices.push({
+                name: `${guild.guild_tokens[i].name}`,
+                value: `${i}`,
+            })
+            tokens.push(`${guild.guild_tokens[i].name}`)
+        }
+
+        if (interaction.isAutocomplete()) {
+            interaction.respond(choices)
+                .catch(console.error);
+        }
+
+        // Must handle interactions (command ones) inside the if statement
+        if (interaction.isCommand()) {
+
+            const amount = interaction.options.getNumber("amount");
+            const address = interaction.options.getUser("address");
+            let tokenIndex = interaction.options.getString("token");
+
+            let tokenName, burnWallet, tokenAddress;
+            let msg = '';
+            let tokenAvalible = true;
+
+            let walletDB = await mongo.getWallet(address.id, guildID)
+
+            // handling tokens that are not listed
+            try {
+                tokenName = guild.guild_tokens[tokenIndex].name;
+                burnWallet = guild.guild_tokens[tokenIndex].burner;
+                tokenAddress = guild.guild_tokens[tokenIndex].address;
+            }
+            catch (e) {
+                console.log('Erro')
+                tokenAvalible = false;
+            }
+
+
+            //await interaction.deferReply();
+            // handling the input
+            if (!tokenAvalible) { // token not listed
+
+                for (i = 0; i < tokens.length; i++) {
+
+                    if (i < (tokens.length - 1)) { msg = `${msg} ${tokens[i]},` } // last token doesnt need comma
+                    else { msg = `${msg} ${tokens[i]}` }
+
+                }
+
+                msg = `That token is unavalible. Please, pick one of the tokens listed on this server: ${msg}`
+                ephemeral = true;
+
+
+            } else if (walletDB == null) { // token listed, but receiver wallet not connected
+                msg = `Hey ${address}, ${interaction.user.username} is trying to send you ${amount} ${tokenName}. Please, register your wallet using /setwallet `;
+                ephemeral = false;
+
+
+            }
+            else { // token listed and receiver wallet connected 
+                msg = `Click the link to transfer: https://peterthebot.com?token=${tokenAddress}&amount=${amount}&receiver=${walletDB.near_wallet}&burner=${burnWallet}`
+                ephemeral = true;
+            };
+
+            await interaction.reply({
+                content: msg,
+                ephemeral: ephemeral,
+            });
 
         }
-        else (token_name = 'Near')
 
 
-        let walletDB = await mongo.getWallet(address.id, guild_id)
-
-        burn_wallet = 'kingsweeper.near'
-        let message;
-
-
-        if (walletDB == null) {
-            message = `Hey ${address}, ${interaction.user.username} is trying to send you ${amount} ${token_name}. Please, register your wallet using /setwallet `;
-            await interaction.reply({
-                content: message,
-                ephemeral: false
-            });
-
-        } else {
-            message = ` click the link to authorize the transfer: https://peterthebot.com?token=${token}&amount=${amount}&receiver=${walletDB.near_wallet}&burner=${burn_wallet}`
-
-            await interaction.reply({
-                content: message,
-                ephemeral: true
-            });
-
-        };
 
     }
 };

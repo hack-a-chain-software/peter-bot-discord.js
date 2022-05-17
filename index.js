@@ -14,11 +14,15 @@ const client = new Client({
 
 );
 
+
+
 const commands = [];
 client.commands = new Collection();
 
 const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
 const eventFiles = fs.readdirSync('./src/events').filter(file => file.endsWith('.js'));
+
+
 
 // getting the commands from the command file
 for (const file of commandFiles) {
